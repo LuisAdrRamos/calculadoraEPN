@@ -1,12 +1,18 @@
+import { Colors } from "@/constants/theme";
+import { Slot } from "expo-router";
+import { StatusBar } from "expo-status-bar"
 import React from "react";
 import { Text, View } from "react-native"
 
-const _layout = () => {
+const RootLayout = () => {
   return (
-    <View>
-      <Text>_layout</Text>
+    <View style={{backgroundColor: Colors.background, flex: 1}}>
+      <Text>Header</Text>
+      <Slot />
+      <StatusBar style="light"/>
+      {/* <Text>Footer</Text> */}
     </View>
   )
 }
 
-export default _layout
+export default RootLayout
