@@ -1,48 +1,111 @@
 import React, { useState } from "react";
-import { Text, View } from "react-native";
-import FAB from "../components/FAB";
- 
-export default function CalculatorApp() {
-  const [display, setDisplay] = useState("0");
- 
-  const onKey = (d: string) => {
-    setDisplay((prev) => (prev === "0" ? d : prev + d));
-    // aquí integrarán operadores, clear, punto, igual, etc.
+import { SafeAreaView, StyleSheet, Text, View } from "react-native";
+import FAB from "@/components/FAB";
+import { Colors } from "@/constants/theme";
+
+export default function CalculadoraEPN() {
+  const [current, setCurrent] = useState("0");  // número actual
+  const [previous, setPrevious] = useState(""); // número anterior
+  const [operator, setOperator] = useState<string | null>(null); // operador actual
+
+  // 👉 Manejo de pulsaciones
+  const handlePress = (value: string) => {
+    if ("0123456789.".includes(value)) {
+      // Concatenar números
+      setCurrent((prev) =>
+        prev === "0" && value !== "." ? value : prev + value
+      );
+    } else if (["+", "-", "x", "÷"].includes(value)) {
+      // Guardar operador
+      setOperator(value);
+      setPrevious(current);
+      setCurrent("0");
+    } else if (value === "=") {
+      calculate();
+    } else if (value === "C") {
+      setCurrent("0");
+      setPrevious("");
+      setOperator(null);
+    } else if (value === "+/-") {
+      setCurrent((prev) => (prev.startsWith("-") ? prev.slice(1) : "-" + prev));
+    } else if (value === "del") {
+      setCurrent((prev) =>
+        prev.length > 1 ? prev.slice(0, -1) : "0"
+      );
+    }
   };
- 
-  const Row = ({ children }: { children: React.ReactNode }) => (
-    <View style={{ flexDirection: "row", gap: 12, marginBottom: 12 }}>
-      {children}
-    </View>
-  );
- 
+
+  // 👉 Cálculo de operaciones
+  const calculate = () => {
+    const num1 = parseFloat(previous);
+    const num2 = parseFloat(current);
+    if (isNaN(num1) || isNaN(num2)) return;
+
+    let result = 0;
+    switch (operator) {
+      case "+": result = num1 + num2; break;
+      case "-": result = num1 - num2; break;
+      case "x": result = num1 * num2; break;
+      case "÷": result = num2 === 0 ? NaN : num1 / num2; break;
+    }
+    setCurrent(result.toString());
+    setOperator(null);
+    setPrevious("");
+  };
+
+  // 👉 Botones organizados como en la imagen
+  const buttons = [
+    ["C", "+/-", "del", "÷"],
+    ["7", "8", "9", "x"],
+    ["4", "5", "6", "-"],
+    ["1", "2", "3", "+"],
+    ["0", ".", "="],
+  ];
+
   return (
-    <View
-      style={{
-        flex: 1,
-        backgroundColor: "#000",
-        padding: 16,
-        justifyContent: "flex-end",
-      }}
-    >
-      <View
-        style={{
-          minHeight: 120,
-          justifyContent: "flex-end",
-          alignItems: "flex-end",
-          marginBottom: 24,
-        }}
-      >
-        <Text style={{ color: "#fff", fontSize: 64, fontWeight: "300" }}>
-          {display}
-        </Text>
+    <SafeAreaView style={styles.container}>
+      {/* Display */}
+      <View style={styles.display}>
+        {previous && <Text style={styles.subDisplay}>{previous} {operator}</Text>}
+        <Text style={styles.mainDisplay}>{current}</Text>
       </View>
-      <Row>
-        <FAB digit="1" onKey={onKey} />
-        <FAB digit="2" onKey={onKey} />
-        <FAB digit="3" onKey={onKey} />
-        <FAB digit="4" onKey={onKey} />
-      </Row>
-    </View>
+
+      {/* Teclado */}
+      <View style={styles.buttons}>
+        {buttons.map((row, i) => (
+          <View key={i} style={styles.row}>
+            {row.map((label) => (
+              <FAB
+                key={label}
+                label={label}
+                onPress={handlePress}
+                flex={label === "0" ? 2 : 1}
+                bg={
+                  ["÷", "x", "-", "+", "="].includes(label)
+                    ? Colors.orange
+                    : ["C", "+/-", "del"].includes(label)
+                      ? Colors.lightGray
+                      : Colors.darkGray
+                }
+                color={
+                  ["C", "+/-", "del"].includes(label)
+                    ? "black"
+                    : "white"
+                }
+              />
+            ))}
+          </View>
+        ))}
+      </View>
+    </SafeAreaView>
   );
 }
+
+const styles = StyleSheet.create({
+  container: { flex: 1, backgroundColor: Colors.background, justifyContent: "flex-end" },
+  display: { paddingHorizontal: 24, marginBottom: 20, alignItems: "flex-end" },
+  subDisplay: { color: Colors.textSecondary, fontSize: 32 },
+  mainDisplay: { color: Colors.textPrimary, fontSize: 72, fontWeight: "300" },
+  buttons: { paddingHorizontal: 8, paddingBottom: 10 },
+  row: { flexDirection: "row", justifyContent: "space-between" },
+});
