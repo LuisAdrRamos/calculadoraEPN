@@ -4,13 +4,13 @@ import * as Haptics from "expo-haptics";
 import { Colors } from "@/constants/theme";
 
 export interface FABProps {
-  label: string;                // Texto que se muestra (número o símbolo)
-  onPress: (value: string) => void; // Acción al presionar el botón
-  size?: number;                // Tamaño del botón
-  bg?: string;                  // Color de fondo
-  color?: string;               // Color del texto
-  flex?: number;                // Permite expandir el botón ("0" es más ancho)
-  style?: ViewStyle;            // Estilo adicional
+  label: string;                
+  onPress: (value: string) => void;
+  size?: number;
+  bg?: string;
+  color?: string;
+  flex?: number;
+  style?: ViewStyle;
 }
 
 const FAB = memo(function FAB({

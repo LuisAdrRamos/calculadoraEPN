@@ -4,19 +4,16 @@ import FAB from "@/components/FAB";
 import { Colors } from "@/constants/theme";
 
 export default function CalculadoraEPN() {
-  const [current, setCurrent] = useState("0");  // número actual
-  const [previous, setPrevious] = useState(""); // número anterior
-  const [operator, setOperator] = useState<string | null>(null); // operador actual
+  const [current, setCurrent] = useState("0");
+  const [previous, setPrevious] = useState("");
+  const [operator, setOperator] = useState<string | null>(null);
 
-  // 👉 Manejo de pulsaciones
   const handlePress = (value: string) => {
     if ("0123456789.".includes(value)) {
-      // Concatenar números
       setCurrent((prev) =>
         prev === "0" && value !== "." ? value : prev + value
       );
     } else if (["+", "-", "x", "÷"].includes(value)) {
-      // Guardar operador
       setOperator(value);
       setPrevious(current);
       setCurrent("0");
@@ -35,7 +32,6 @@ export default function CalculadoraEPN() {
     }
   };
 
-  // 👉 Cálculo de operaciones
   const calculate = () => {
     const num1 = parseFloat(previous);
     const num2 = parseFloat(current);
@@ -53,7 +49,6 @@ export default function CalculadoraEPN() {
     setPrevious("");
   };
 
-  // 👉 Botones organizados como en la imagen
   const buttons = [
     ["C", "+/-", "del", "÷"],
     ["7", "8", "9", "x"],
